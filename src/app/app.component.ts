@@ -9,18 +9,13 @@ import { ApiService } from './services/api.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
     public covid$: Observable<any>;
-    public covidSub: Subscription;
 
     constructor(private api: ApiService) {}
 
     public ngOnInit(): void {
         this.covid$ = this.api.getCovidData();
-        this.covidSub = this.covid$.subscribe((data: any) => {
-            console.log(data);
-        });
     }
 
     public ngOnDestroy(): void {
-        this.covidSub.unsubscribe();
     }
 }
