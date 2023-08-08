@@ -1,4 +1,7 @@
-<div *ngIf="data">
+<div *ngIf="data" class="log-data">
     <button (click)="onClick()">Log Data</button>
 </div>
 <div *ngIf="!data">Data is loading...</div>
+<div>
+    <svg class="line-chart"></svg>
+</div>
