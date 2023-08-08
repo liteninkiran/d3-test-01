@@ -63,10 +63,6 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
         }
     }
 
-    public onClick(): void {
-        console.log(this.data);
-    }
-
     private updateChart(): void {
         if (this.data) {
             this.setParams();
