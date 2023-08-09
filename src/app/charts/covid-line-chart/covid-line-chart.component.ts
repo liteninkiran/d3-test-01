@@ -81,7 +81,35 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setElements(): void {
+        const translations = this.getTranslations();
 
+        this.xAxisContainer = this.svg
+            .append('g')
+            .attr('class', 'x-axis-container')
+            .attr('transform', translations.xAxis);
+
+        this.yAxisContainer = this.svg
+            .append('g')
+            .attr('class', 'y-axis-container')
+            .attr('transform', translations.yAxis);
+
+        this.title = this.svg
+            .append('g')
+            .attr('class', 'title-container')
+            .attr('transform', translations.title)
+            .append('text')
+            .attr('class', 'title')
+            .style('text-anchor', 'middle');
+
+        this.dataContainer = this.svg
+            .append('g')
+            .attr('class', 'data-container')
+            .attr('transform', translations.data);
+
+        this.legendContainer = this.svg
+            .append('g')
+            .attr('class', 'legend-container')
+            .attr('transform', translations.legend);
     }
 
     private setParams(): void {
@@ -104,4 +132,13 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
 
     }
 
+    private getTranslations(): any {
+        return {
+            xAxis : `translate(${this.margins.left}, ${this.margins.top + this.innerHeight})`,
+            yAxis : `translate(${this.margins.left}, ${this.margins.top})`,
+            title : `translate(${this.margins.left + 0.5 * this.innerWidth}, ${0.5 * this.margins.top})`,
+            data  : `translate(${this.margins.left}, ${this.margins.top})`,
+            legend: `translate(${this.margins.left}, ${this.dimensions.height - 0.5 * this.margins.bottom + 10})`,
+        };
+    }
 }
