@@ -45,6 +45,10 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     // Line generator
     public line: any;
 
+    // Time formatters
+    public timeParse = d3.timeParse('%Y%m%d');
+    public niceData = d3.timeFormat('%B %Y');
+
     constructor(element: ElementRef) {
         this.host = d3.select(element.nativeElement);
     }
@@ -113,6 +117,29 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setParams(): void {
+        // Set domains
+        const xDomain = [0, Date.now()];
+        const yDomain = [0, 100];
+        const colourDomain = ['A', 'B', 'C'];
+
+        // Set ranges
+        const xRange = [0, this.innerWidth];
+        const yRange = [this.innerHeight, 0];
+        const colourRange = d3.schemeCategory10;
+
+        // Set scales
+        this.x = d3.scaleTime()
+            .domain(xDomain)
+            .range(xRange);
+
+        this.y = d3.scaleLinear()
+            .domain(yDomain)
+            .range(yRange);
+
+        this.colours = d3
+            .scaleOrdinal()
+            .domain(colourDomain)
+            .range(colourRange);
 
     }
 
