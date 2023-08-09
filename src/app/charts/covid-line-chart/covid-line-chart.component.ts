@@ -34,13 +34,13 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     public title: any;
 
     // Scales
-    public x: any;
-    public y: any;
-    public colours: any;
+    public x: d3.ScaleTime<number, number>;
+    public y: d3.ScaleLinear<number, number>;
+    public colours: d3.ScaleOrdinal<string, unknown>;
 
     // Axes
-    public xAxis: any;
-    public yAxis: any;
+    public xAxis: d3.Axis<Date | d3.NumberValue>;
+    public yAxis: d3.Axis<any>;
 
     // Line generator
     public line: any;
@@ -48,6 +48,14 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     // Time formatters
     public timeParse = d3.timeParse('%Y%m%d');
     public niceData = d3.timeFormat('%B %Y');
+
+    // Getters
+    get lineData() {
+        return this.data.map((d: any) => ({
+            x: this.timeParse(d.date),
+            y: d.hospitalized,
+        }));
+    }
 
     constructor(element: ElementRef) {
         this.host = d3.select(element.nativeElement);
@@ -117,8 +125,13 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setParams(): void {
-        // Set domains
-        const xDomain = [0, Date.now()];
+        // Temporary solution
+        const parsedDates = this.data.map((d: any) => this.timeParse(d.date));
+
+        console.log(this.lineData);
+
+        // Set domains (min/max dates, min/max values, colours)
+        const xDomain = d3.extent(parsedDates).map(d => Date.parse(d));
         const yDomain = [0, 100];
         const colourDomain = ['A', 'B', 'C'];
 
@@ -140,7 +153,6 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
             .scaleOrdinal()
             .domain(colourDomain)
             .range(colourRange);
-
     }
 
     private setLabels(): void {
