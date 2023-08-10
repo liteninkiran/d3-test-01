@@ -39,7 +39,7 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     public colours: d3.ScaleOrdinal<string, unknown>;
 
     // Selected Data
-    public selected = ['hospitalized', 'death', 'hospitalizedCurrently'];
+    public selected: Array<string> = ['hospitalized', 'death', 'hospitalizedCurrently'];
     public active = [true, true, true];
 
     // Axes
@@ -134,15 +134,14 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setParams(): void {
-        // Temporary solution
-        const parsedDates = this.data.map((d: any) => this.timeParse(d.date));
-
-        console.log(this.lineData);
+        const data: Array<any> = this.lineData;
+        const parsedDates: Array<Date> = this.data.map((d: any) => this.timeParse(d.date));
+        const maxValues: Array<number> = data.map((series) => d3.max(series.data, (d: any) => parseInt(d.y)));
 
         // Set domains (min/max dates, min/max values, colours)
-        const xDomain = d3.extent(parsedDates).map(d => Date.parse(d));
-        const yDomain = [0, 100];
-        const colourDomain = ['A', 'B', 'C'];
+        const xDomain: Array<number> = d3.extent(parsedDates).map(d => Date.parse(d));
+        const yDomain: any = d3.max(maxValues);
+        const colourDomain: Array<string> = this.selected;
 
         // Set ranges
         const xRange = [0, this.innerWidth];
