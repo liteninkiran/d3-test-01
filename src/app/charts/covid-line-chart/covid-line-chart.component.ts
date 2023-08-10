@@ -233,6 +233,21 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
             .text((d: any) => d);
 
         itemContainers.exit().remove();
+
+        // Position the Legend Items
+        let totalPadding = 0;
+        this.legendContainer
+            .selectAll('g.legend-item')
+            .each(function() {
+                const g = d3.select(this);
+                g.attr('transform', `translate(${totalPadding}, 0)`);
+                totalPadding += (g.node() as SVGSVGElement).getBBox().width + 10;
+            });
+
+        // Centre the Legend
+        const legendWidth = this.legendContainer.node().getBBox().width;
+        const translations = this.getTranslations(legendWidth);
+        this.legendContainer.attr('transform', translations.ctr.legend);
     }
 
     private draw(): void {
@@ -257,13 +272,16 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
         lines.exit().remove();
     }
 
-    private getTranslations(): any {
+    private getTranslations(legendWidth = 0): any {
         return {
             xAxis : `translate(${this.margins.left}, ${this.margins.top + this.innerHeight})`,
             yAxis : `translate(${this.margins.left}, ${this.margins.top})`,
             title : `translate(${this.margins.left + 0.5 * this.innerWidth}, ${0.5 * this.margins.top})`,
             data  : `translate(${this.margins.left}, ${this.margins.top})`,
             legend: `translate(${this.margins.left}, ${this.dimensions.height - 0.5 * this.margins.bottom + 10})`,
+            ctr: {
+                legend: `translate(${this.margins.left + 0.5 * (this.innerWidth - legendWidth)}, ${this.dimensions.height - 0.5 * this.margins.bottom + 10})`,
+            },
         };
     }
 }
