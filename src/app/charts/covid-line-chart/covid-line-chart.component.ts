@@ -12,8 +12,8 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     @Input() public data: any;
 
     // Main elements
-    public host: any;
-    public svg: any;
+    public host: d3.Selection<any, any, any, any>;
+    public svg: d3.Selection<any, any, any, any>;
 
     // Dimensions
     public dimensions: DOMRect;
@@ -30,7 +30,7 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     public dataContainer: any;
     public xAxisContainer: any;
     public yAxisContainer: any;
-    public legendContainer: any;
+    public legendContainer: d3.Selection<any, any, any, any>;
     public title: any;
 
     // Scales
@@ -201,7 +201,38 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setLegend(): void {
+        const itemContainers: d3.Selection<any, any, any, any> = this.legendContainer
+            .selectAll('g.legend-item')
+            .data(this.selected);
 
+        const newItems: d3.Selection<any, any, any, any> = itemContainers.enter()
+            .append('g')
+            .attr('class', 'legend-item')
+            .each(function(d) {
+                const g = d3.select(this);
+                g.append('circle')
+                    .attr('class', 'legend-icon')
+                    .attr('cx', 3)
+                    .attr('cy', -4)
+                    .attr('r', 3);
+
+                g.append('text')
+                    .attr('class', 'legend-label')
+                    .attr('x', 9)
+                    .style('font-size', '0.8rem');
+            });
+
+        const mergedSelection: d3.Selection<any, any, any, any> = newItems.merge(itemContainers);
+
+        mergedSelection
+            .selectAll('circle.legend-icon')
+            .style('fill', (d: any) =>  this.colours(d).toString());
+
+        mergedSelection
+            .selectAll('text.legend-label')
+            .text((d: any) => d);
+
+        itemContainers.exit().remove();
     }
 
     private draw(): void {
