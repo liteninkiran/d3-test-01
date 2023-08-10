@@ -47,11 +47,10 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     public yAxis: d3.Axis<any>;
 
     // Line generator
-    public line: any;
+    public line: d3.Line<any>;
 
     // Time formatters
     public timeParse = d3.timeParse('%Y%m%d');
-    public niceData = d3.timeFormat('%B %Y');
 
     // Getters
     get lineData() {
@@ -161,6 +160,10 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
             .scaleOrdinal()
             .domain(colourDomain)
             .range(colourRange);
+
+        this.line = d3.line()
+            .x((d: any) => this.x(d.x))
+            .y((d: any) => this.y(d.y));
     }
 
     private setLabels(): void {
@@ -202,7 +205,25 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private draw(): void {
+        // Bind data
+        const lines = this.dataContainer
+            .selectAll('path.data')
+            .data(this.lineData, (d: { name: string; }) => d.name);
 
+        // Enter and merge
+        lines.enter()
+            .append('path')
+            .attr('class', 'data')
+            .style('fill', 'none')
+            .style('stroke-width', '2px')
+            .merge(lines)
+            .transition()
+            .duration(500)
+            .attr('d', (d: { data: any[] | Iterable<any>; }) => this.line(d.data))
+            .style('stroke', (d: { name: string; }) => this.colours(d.name));
+
+        // Exit
+        lines.exit().remove();
     }
 
     private getTranslations(): any {
