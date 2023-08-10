@@ -201,37 +201,46 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setLegend(): void {
+
+        // Methods
+        const generateLegendItems = (selection: any) => {
+            selection
+                .append('circle')
+                .attr('class', 'legend-icon')
+                .attr('cx', 3)
+                .attr('cy', -4)
+                .attr('r', 3);
+
+            selection
+                .append('text')
+                .attr('class', 'legend-label')
+                .attr('x', 9)
+                .style('font-size', '0.8rem');
+        };
+
+        const updateLegendItems = (selection: any) => {
+            selection
+                .selectAll('circle.legend-icon')
+                .style('fill', (d) => this.colours(d));
+            selection
+                .selectAll('text.legend-label')
+                .text((d) => d);
+        };
+
+        // Bind data
         const itemContainers: d3.Selection<any, any, any, any> = this.legendContainer
             .selectAll('g.legend-item')
             .data(this.selected);
 
-        const newItems: d3.Selection<any, any, any, any> = itemContainers.enter()
+        // Enter
+        itemContainers.enter()
             .append('g')
             .attr('class', 'legend-item')
-            .each(function(d) {
-                const g = d3.select(this);
-                g.append('circle')
-                    .attr('class', 'legend-icon')
-                    .attr('cx', 3)
-                    .attr('cy', -4)
-                    .attr('r', 3);
+            .call(generateLegendItems)
+            .merge(itemContainers)
+            .call(updateLegendItems);
 
-                g.append('text')
-                    .attr('class', 'legend-label')
-                    .attr('x', 9)
-                    .style('font-size', '0.8rem');
-            });
-
-        const mergedSelection: d3.Selection<any, any, any, any> = newItems.merge(itemContainers);
-
-        mergedSelection
-            .selectAll('circle.legend-icon')
-            .style('fill', (d: any) =>  this.colours(d).toString());
-
-        mergedSelection
-            .selectAll('text.legend-label')
-            .text((d: any) => d);
-
+        // Exit
         itemContainers.exit().remove();
 
         // Position the Legend Items
