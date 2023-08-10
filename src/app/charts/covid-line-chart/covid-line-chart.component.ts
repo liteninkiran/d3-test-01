@@ -238,7 +238,17 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
             .attr('class', 'legend-item')
             .call(generateLegendItems)
             .merge(itemContainers)
-            .call(updateLegendItems);
+            .call(updateLegendItems)
+            .on('mouseover', (event: PointerEvent, name: string) => this.hoverLine(name))
+            .on('mouseleave', () => this.hoverLine())
+            .on('click', (event: PointerEvent, name: string) => {
+                this.toggleActive(name);
+                this.hoverLine();
+                this.updateChart();
+            })
+            .transition()
+            .duration(500)
+            .style('opacity', (d, i) => this.active[i] ? 1 : 0.3);
 
         // Exit
         itemContainers.exit().remove();
@@ -292,5 +302,25 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
                 legend: `translate(${this.margins.left + 0.5 * (this.innerWidth - legendWidth)}, ${this.dimensions.height - 0.5 * this.margins.bottom + 10})`,
             },
         };
+    }
+
+    private toggleActive(selected: string): void {
+        const index = this.selected.indexOf(selected);
+        this.active[index] = !this.active[index];
+    }
+
+    private hoverLine(selected?: string): void {
+        const index = this.selected.indexOf(selected);
+        if (selected && this.active[index]) {
+            this.dataContainer
+                .selectAll('path.data')
+                .attr('opacity', (d) => d.name === selected ? 1 : 0.3)
+                .style('stroke-width', (d) => d.name === selected ? '3px' : '2px');
+        } else {
+            this.dataContainer
+                .selectAll('path.data')
+                .style('stroke-width', '2px')
+                .attr('opacity', null);
+        }
     }
 }
