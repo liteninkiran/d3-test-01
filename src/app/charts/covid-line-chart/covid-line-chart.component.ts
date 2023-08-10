@@ -38,6 +38,10 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     public y: d3.ScaleLinear<number, number>;
     public colours: d3.ScaleOrdinal<string, unknown>;
 
+    // Selected Data
+    public selected = ['hospitalized', 'death', 'hospitalizedCurrently'];
+    public active = [true, true, true];
+
     // Axes
     public xAxis: d3.Axis<Date | d3.NumberValue>;
     public yAxis: d3.Axis<any>;
@@ -51,10 +55,15 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
 
     // Getters
     get lineData() {
-        return this.data.map((d: any) => ({
-            x: this.timeParse(d.date),
-            y: d.hospitalized,
-        }));
+        return this.selected
+            .filter((d, i) => this.active[i])
+            .map((item) => ({
+                name: item,
+                data: this.data.map((d) => ({
+                    x: this.timeParse(d.date),
+                    y: d[item],
+                })).sort((a, b) => a.x < b.x ? -1 : 1),
+            }));
     }
 
     constructor(element: ElementRef) {
