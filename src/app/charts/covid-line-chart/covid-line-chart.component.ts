@@ -140,7 +140,7 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
 
         // Set domains (min/max dates, min/max values, colours)
         const xDomain: Array<number> = d3.extent(parsedDates).map(d => Date.parse(d));
-        const yDomain: any = d3.max(maxValues);
+        const yDomain: any = [0, d3.max(maxValues)];
         const colourDomain: Array<string> = this.selected;
 
         // Set ranges
@@ -168,7 +168,33 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setAxis(): void {
+        this.xAxis = d3
+            .axisBottom(this.x)
+            .ticks(d3.timeMonth.every(1))
+            .tickFormat(d3.timeFormat('%b %Y'))
+            .tickSizeOuter(0);
 
+        this.xAxisContainer
+            .transition()
+            .duration(500)
+            .call(this.xAxis);
+
+        this.yAxis = d3.axisLeft(this.y)
+            .ticks(5)
+            .tickSizeOuter(0)
+            .tickSizeInner(-this.innerWidth)
+            .tickFormat(d3.format('~s'));
+
+        this.yAxisContainer
+            .transition()
+            .duration(500)
+            .call(this.yAxis);
+
+        // Apply dashes to all horizontal lines except the x-axis
+        this.yAxisContainer
+            .selectAll('.tick:not(:nth-child(2)) line')
+            .style('stroke', '#ddd')
+            .style('stroke-dasharray', '2 2');
     }
 
     private setLegend(): void {
