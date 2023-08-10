@@ -167,7 +167,7 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
     }
 
     private setLabels(): void {
-
+        this.title.text('Covid Evolution in US');
     }
 
     private setAxis(): void {
@@ -208,7 +208,7 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
         // Bind data
         const lines = this.dataContainer
             .selectAll('path.data')
-            .data(this.lineData, (d: { name: string; }) => d.name);
+            .data(this.lineData, (d: any) => d.name);
 
         // Enter and merge
         lines.enter()
@@ -219,8 +219,8 @@ export class CovidLineChartComponent implements OnInit, OnChanges {
             .merge(lines)
             .transition()
             .duration(500)
-            .attr('d', (d: { data: any[] | Iterable<any>; }) => this.line(d.data))
-            .style('stroke', (d: { name: string; }) => this.colours(d.name));
+            .attr('d', (d: any) => this.line(d.data))
+            .style('stroke', (d: any) => this.colours(d.name));
 
         // Exit
         lines.exit().remove();
